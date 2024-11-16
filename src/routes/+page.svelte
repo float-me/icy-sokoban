@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { PriorityDeque } from 'priority-deque';
-	import { add_vector, Map2D } from '$lib/map2d.svelte';
-	import type { vector } from '$lib/map2d.svelte';
+	import { PriorityDeque } from "priority-deque";
+	import { add_vector, Box, boxes, Map2D } from "$lib/map2d.svelte";
+	import type { vector } from "$lib/map2d.svelte";
 
 	let lastFrameTime = 0;
 	let frame = 0;
@@ -12,29 +12,26 @@
 		[0, 0, 0, 0],
 		[0, 0, 0, 0],
 		[0, 0, 1, 0],
-		[1, 0, 0, 0]
+		[1, 0, 0, 0],
 	]);
 
 	let obj = new Map2D([
-		[0, 0, 0, 0],
-		[0, 3, 0, 0],
-		[0, 0, 0, 2],
-		[1, 2, 0, 0],
-		[0, 3, 0, 0],
-		[0, 0, 0, 0]
+		[-1, -1, -1, -1],
+		[-1, -1, -1, -1],
+		[-1, -1, -1, -1],
+		[-1, -1, -1, -1],
+		[-1, -1, -1, -1],
+		[-1, -1, -1, -1],
 	]);
-
-	let player_pos: vector = [0, 3];
-	let player_moving = false;
-
-	let button = [
-		[0, 0, 0, 0],
-		[0, 0, 1, 0],
-		[0, 1, 1, 0],
-		[0, 1, 0, 0],
-		[0, 0, 0, 0],
-		[0, 0, 0, 0]
-	];
+	let player = new Box([0, 3], 0);
+	new Box([1, 3], 1);
+	new Box([3, 2], 1);
+	new Box([1, 1], 2);
+	new Box([1, 4], 2);
+	for (const boxId in boxes) {
+		const box = boxes[boxId];
+		obj.set_at(box.position, box.id);
+	}
 
 	let action_id = 0;
 
@@ -69,20 +66,20 @@
 	}
 
 	function handleKeyDown(event: KeyboardEvent) {
-		if (player_moving) {
+		if (player.moving) {
 			return;
 		}
 		switch (event.key) {
-			case 'ArrowUp':
+			case "ArrowUp":
 				player_move([0, -1]);
 				break;
-			case 'ArrowDown':
+			case "ArrowDown":
 				player_move([0, 1]);
 				break;
-			case 'ArrowLeft':
+			case "ArrowLeft":
 				player_move([-1, 0]);
 				break;
-			case 'ArrowRight':
+			case "ArrowRight":
 				player_move([1, 0]);
 				break;
 			default:
@@ -105,44 +102,41 @@
 		return true;
 	}
 
-	function add_move(before: vector, direction: vector) {
-		let after = add_vector(before, direction);
+	function add_move(box: Box, direction: vector) {
+		let after = add_vector(box.position, direction);
 		if (!is_valid(after)) {
 			return false;
 		}
-		if (obj.get_at(after) !== 0) {
+		if (obj.get_at(after) !== -1) {
 			return false;
 		}
-		rewrite(before, after, direction);
+		rewrite(box, after, direction);
 		return true;
 	}
 
-	function rewrite(before: vector, after: vector, direction: vector) {
-		let objType = obj.get_at(before);
-		obj.set_at(after, objType);
-		obj.set_at(before, 0);
+	function rewrite(box: Box, after: vector, direction: vector) {
+		box.moving = true;
+		obj.set_at(after, box.id);
+		obj.set_at(box.position, -1);
+		box.position = after;
 		queue.push(new Action(frame + 100, after, direction));
 	}
 
 	function player_move(direction: vector) {
-		let before = player_pos;
+		let before = player.position;
 		let after = add_vector(before, direction);
 		if (!is_valid(after)) {
 			return false;
 		}
-		if (obj.get_at(after) === 0) {
-			rewrite(before, after, direction);
-			player_moving = true;
-			player_pos = after;
+		const boxId = obj.get_at(after);
+		if (boxId === -1) {
+			rewrite(player, after, direction);
 			return true;
 		}
-		let box_move = add_move(after, direction);
+		const box = boxes[boxId];
+		let box_move = add_move(box, direction);
 		if (box_move) {
-			player_moving = add_move(before, direction);
-			if (player_moving) {
-				player_pos = after;
-			}
-			return player_moving;
+			return add_move(player, direction);
 		}
 		return false;
 	}
@@ -157,7 +151,6 @@
 				if (action) {
 					calc(action);
 				}
-				console.log(player_moving);
 			}
 
 			lastFrameTime = time;
@@ -166,43 +159,41 @@
 	}
 
 	function calc(action: Action) {
-		let isPlayer = false;
-		if (obj.get_at(action.position) === 1) {
-			isPlayer = true;
-			player_pos = action.position;
-		}
-		let attempt = false;
+		const boxId = obj.get_at(action.position);
+		const box = boxes[boxId];
+		box.position = action.position;
+		box.moving = false;
 		switch (land.get_at(action.position)) {
 			case 2:
-				attempt = add_move(action.position, action.direction);
+				add_move(box, action.direction);
 				break;
 			case 3:
-				attempt = add_move(action.position, [1, 0]);
+				add_move(box, [1, 0]);
 				break;
 			case 4:
-				attempt = add_move(action.position, [0, -1]);
+				add_move(box, [0, -1]);
 				break;
 			case 5:
-				attempt = add_move(action.position, [-1, 0]);
+				add_move(box, [-1, 0]);
 				break;
 			case 6:
-				attempt = add_move(action.position, [0, 1]);
+				add_move(box, [0, 1]);
 				break;
 			default:
-				if (obj.get_at(action.position) === 3) {
-					attempt = add_move(action.position, action.direction);
+				if (box.objType === 2) {
+					// Icy Box
+					add_move(box, action.direction);
 				}
 				break;
-		}
-		if (isPlayer && !attempt) {
-			player_moving = false;
 		}
 	}
 
 	// Start the game loop only on the client
-	if (typeof window !== 'undefined') {
+	if (typeof window !== "undefined") {
 		requestAnimationFrame(gameLoop);
 	}
+
+	$inspect(obj.info);
 </script>
 
 <div class="grid auto-rows-[50px] grid-cols-4 gap-2 rounded-md bg-gray-200 p-4">
@@ -218,20 +209,7 @@
 				class:bg-purple-300={land_type === 5}
 				class:bg-pink-300={land_type === 6}
 				class:bg-teal-300={land_type === 7}
-			>
-				<!-- Display object type if it's not 0 -->
-				{#if obj.info[rowIndex][colIndex] !== 0}
-					<span class="absolute inset-0 flex items-center justify-center font-bold text-white">
-						{#if obj.info[rowIndex][colIndex] === 1}
-							🧍 <!-- Player -->
-						{:else if obj.info[rowIndex][colIndex] === 2}
-							📦 <!-- Box -->
-						{:else if obj.info[rowIndex][colIndex] === 3}
-							❄️ <!-- Icy Box -->
-						{/if}
-					</span>
-				{/if}
-			</div>
+			></div>
 		{/each}
 	{/each}
 </div>

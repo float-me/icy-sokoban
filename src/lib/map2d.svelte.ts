@@ -21,3 +21,23 @@ export class Map2D {
     this.info[pos[1]][pos[0]] = value
   }
 }
+
+let boxId = 0
+export let boxes: Box[] = []
+
+export class Box {
+  id: number
+  position: vector
+  direction: vector
+  moving: boolean
+  objType: number
+  constructor (position: vector, objType: number) {
+    this.id = boxId
+    boxId += 1
+    this.position = position
+    this.direction = [1, 0]
+    this.objType = objType // 0: Player, 1: Wooden box, 2: Icy box
+    this.moving = false
+    boxes.push(this)
+  }
+}
