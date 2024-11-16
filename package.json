@@ -19,6 +19,7 @@
 		"@sveltejs/vite-plugin-svelte": "^4.0.0",
 		"@tailwindcss/typography": "^0.5.15",
 		"@types/eslint": "^9.6.0",
+		"@types/three": "^0.170.0",
 		"autoprefixer": "^10.4.20",
 		"eslint": "^9.7.0",
 		"eslint-config-prettier": "^9.1.0",
@@ -36,7 +37,7 @@
 		"vitest": "^2.0.4"
 	},
 	"dependencies": {
-		"@threlte/core": "^7.3.1",
+		"@threlte/core": "^8.0.0-next.30",
 		"priority-deque": "^1.1.0",
 		"three": "^0.170.0"
 	}
