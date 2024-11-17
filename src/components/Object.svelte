@@ -1,7 +1,18 @@
 <script lang="ts">
-    import {T} from "@threlte/core";
-  import { RGBA_ASTC_10x10_Format } from "three";
-    let {row, col, type} = $props();
+    import {T, useTask} from "@threlte/core";
+    let {row, col, type, dir} = $props();
+
+    let ratio = $state(1);
+    useTask((delta) => {
+        ratio = Math.min(ratio+delta/0.2, 1);
+    })
+
+    let x = $derived(col - dir[0] * (1-ratio));
+    let z = $derived(row - dir[1] * (1-ratio));
+
+    $effect(()=>{
+        ratio = 0 * (row + col);
+    }) //evaluates whenever row or col changes
 
     const getcolor = (tp : number) => {
         switch(tp){
@@ -17,17 +28,16 @@
     }
 
     let color = $derived(getcolor(type));
-
 </script>
 
 {#if type === 0}
-<T.Mesh position={[col,0.9, row]} castShadow>
+<T.Mesh position={[x,0.9,z]} castShadow>
     <T.SphereGeometry args={[ 0.4, 32, 16 ]}/>
     <T.MeshStandardMaterial color="rgb(0,0,0)" roughness={0.5}/>
 </T.Mesh>
 
 {:else}
-<T.Mesh position={[col,0.9, row]} castShadow>
+<T.Mesh position={[x,0.9, z]} castShadow>
     <T.BoxGeometry args={[0.8, 0.8, 0.8]}/>
     <T.MeshStandardMaterial color={color}/>
 </T.Mesh>

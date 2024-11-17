@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {T} from "@threlte/core";
+    import {T, useTask} from "@threlte/core";
     let {row, col, type} = $props();
 
     const getcolor = (tp : number) => {
@@ -23,8 +23,8 @@
 </T.Mesh>
 
 {#if type === 1}
-<T.Mesh position={[col+0.1, 0.6, row]} castShadow>
-<T.BoxGeometry args={[0.8, 0.2, 0.8]} />
+<T.Mesh position={[col+0.1, 0.8, row]} castShadow>
+<T.BoxGeometry args={[0.8, 0.3, 0.8]} />
 <T.MeshStandardMaterial color="#b3b3b3"/>
 </T.Mesh>
 {/if}

@@ -123,6 +123,7 @@
     obj.set_at(after, box.id);
     obj.set_at(box.position, -1);
     box.position = after;
+    box.direction = direction;
     queue.push(new Action(frame + 10, after, direction));
   }
 
@@ -198,6 +199,13 @@
   }
 
   $inspect(obj.info);
+
+  const indices : number[][] = [];
+  for (let row = 0; row < 6; row++) {
+    for (let col = 0; col < 4; col++) {
+      indices.push([row, col]); // Add the (row, column) pair to the array
+    }
+  }
 </script>
 
 <Canvas>
@@ -214,13 +222,9 @@
 		<Floor row={rowIndex} col={colIndex} type={land_type}/>
 	  {/each}
   {/each}
-  {#each obj.info as row, rowIndex}
-	  {#each row as boxId, colIndex}
-	  	{#if boxId !== -1}
-			<Object row={rowIndex} col={colIndex} type={boxes[boxId].objType}/>
-		{/if}
-	  {/each}
-  {/each}
+  {#each indices.filter(([i, j]) => obj.info[i][j] != -1) as [i, j] (obj.info[i][j])}
+    <Object row={i} col={j} type={boxes[obj.info[i][j]].objType} dir={boxes[obj.info[i][j]].direction}/>
+	{/each}
 </Canvas>
 
 <svelte:window onkeydown={handleKeyDown} />

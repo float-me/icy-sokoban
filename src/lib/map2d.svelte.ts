@@ -23,7 +23,8 @@ export class Map2D {
 }
 
 let boxId = 0
-export let boxes: Box[] = []
+const v : Array<Box> = [];
+export const boxes = $state(v)
 
 export class Box {
   id: number
@@ -35,7 +36,7 @@ export class Box {
     this.id = boxId
     boxId += 1
     this.position = position
-    this.direction = [1, 0]
+    this.direction = [0, 0]
     this.objType = objType // 0: Player, 1: Wooden box, 2: Icy box
     this.moving = false
     boxes.push(this)
