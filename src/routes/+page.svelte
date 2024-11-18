@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { PriorityDeque } from "priority-deque";
 	import { add_vector, Box, boxes, Map2D } from "$lib/map2d.svelte";
 	import type { vector } from "$lib/map2d.svelte";
 
 	import { Canvas, T } from "@threlte/core";
 	import Floor from "../components/Floor.svelte";
 	import Object from "../components/Object.svelte";
+	import { Action, actionQueue } from "$lib/action";
 
 	let lastFrameTime = 0;
 	let frame = 0;
@@ -37,38 +37,6 @@
 		obj.set_at(box.position, box.id);
 	}
 
-	let action_id = 0;
-
-	class Action {
-		id: number;
-		time: number;
-		position: vector;
-		direction: vector;
-		constructor(time: number, position: vector, direction: vector) {
-			this.id = action_id;
-			action_id += 1;
-			this.time = time;
-			this.position = position;
-			this.direction = direction;
-		}
-	}
-
-	function compareAction(a: Action, b: Action) {
-		if (a.time < b.time) {
-			return -1;
-		} else if (a.time > b.time) {
-			return 1;
-		} else {
-			if (a.id < b.id) {
-				return -1;
-			} else if (a.id > b.id) {
-				return 1;
-			} else {
-				return 0;
-			}
-		}
-	}
-
 	function handleKeyDown(event: KeyboardEvent) {
 		if (player.moving) {
 			return;
@@ -90,8 +58,6 @@
 				break;
 		}
 	}
-
-	let queue = new PriorityDeque<Action>({ compare: compareAction });
 
 	function is_valid(pos: vector) {
 		if (pos[0] < 0 || pos[0] >= land.width) {
@@ -134,7 +100,7 @@
 		obj.set_at(box.position, -1);
 		box.position = after;
 		box.direction = direction;
-		queue.push(new Action(frame + 10, after, direction));
+		actionQueue.push(new Action(frame + 10, after, direction));
 	}
 
 	function gameLoop(time: number) {
@@ -142,8 +108,8 @@
 			// roughly 60fps
 			// Update game state
 			frame++;
-			while (frame === queue.findMin()?.time) {
-				let action = queue.pop();
+			while (frame === actionQueue.findMin()?.time) {
+				let action = actionQueue.pop();
 				if (action) {
 					calc(action);
 				}
@@ -188,8 +154,6 @@
 	if (typeof window !== "undefined") {
 		requestAnimationFrame(gameLoop);
 	}
-
-	$inspect(obj.info);
 
 	const indices: number[][] = [];
 	for (let row = 0; row < 6; row++) {
