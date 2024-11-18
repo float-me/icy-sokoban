@@ -213,12 +213,13 @@
 			<Floor row={rowIndex} col={colIndex} type={land_type} />
 		{/each}
 	{/each}
-	{#each indices.filter(([i, j]) => obj.info[i][j] != -1) as [i, j] (obj.info[i][j])}
+	{#each boxes as box}
 		<Object
-			row={i}
-			col={j}
-			type={boxes[obj.info[i][j]].objType}
-			dir={boxes[obj.info[i][j]].direction}
+			row={box.position[1]}
+			col={box.position[0]}
+			type={box.objType}
+			dir={box.direction}
+			moving={box.moving}
 		/>
 	{/each}
 </Canvas>

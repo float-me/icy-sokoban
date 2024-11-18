@@ -28,9 +28,9 @@ export const boxes = $state(v)
 
 export class Box {
   id: number
-  position: vector
-  direction: vector
-  moving: boolean
+  position: vector = $state([0, 0])
+  direction: vector = $state([0, 0])
+  moving: boolean = $state(false)
   pushable: boolean
   objType: number
   constructor (position: vector, objType: number) {
