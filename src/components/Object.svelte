@@ -3,12 +3,14 @@
 	let { row, col, type, dir, moving } = $props();
 
 	let count = $state(0);
-	let ratio = $derived(count / 10);
 	useTask((delta) => {
 		if (count < 10) {
 			count += 1;
 		}
 	});
+
+	const slow_start = (p:number) => p*p*(2-p);
+	let ratio = $derived(moving === 1? count / 10 : slow_start(count/10));
 
 	let x = $derived(col - dir[0] * (1 - ratio));
 	let z = $derived(row - dir[1] * (1 - ratio));
@@ -33,6 +35,7 @@
 	};
 
 	let color = $derived(getcolor(type));
+
 </script>
 
 {#if type === 0}
