@@ -23,7 +23,7 @@ export class Map2D {
 }
 
 let boxId = 0
-const v : Array<Box> = [];
+const v: Array<Box> = []
 export const boxes = $state(v)
 
 export class Box {
@@ -31,6 +31,7 @@ export class Box {
   position: vector
   direction: vector
   moving: boolean
+  pushable: boolean
   objType: number
   constructor (position: vector, objType: number) {
     this.id = boxId
@@ -38,6 +39,11 @@ export class Box {
     this.position = position
     this.direction = [0, 0]
     this.objType = objType // 0: Player, 1: Wooden box, 2: Icy box
+    if (this.objType === 0) {
+      this.pushable = true
+    } else {
+      this.pushable = false
+    }
     this.moving = false
     boxes.push(this)
   }
