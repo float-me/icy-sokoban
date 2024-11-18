@@ -154,13 +154,6 @@
 	if (typeof window !== "undefined") {
 		requestAnimationFrame(gameLoop);
 	}
-
-	const indices: number[][] = [];
-	for (let row = 0; row < 6; row++) {
-		for (let col = 0; col < 4; col++) {
-			indices.push([row, col]); // Add the (row, column) pair to the array
-		}
-	}
 </script>
 
 <Canvas>

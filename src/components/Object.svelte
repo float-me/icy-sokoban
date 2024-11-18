@@ -2,16 +2,21 @@
 	import { T, useTask } from "@threlte/core";
 	let { row, col, type, dir, moving } = $props();
 
-	let ratio = $state(1);
+	let count = $state(0);
+	let ratio = $derived(count / 100);
 	useTask((delta) => {
-		ratio = Math.min(ratio + delta / 0.2, 1);
+		if (count < 100) {
+			count += 1;
+		}
 	});
 
 	let x = $derived(col - dir[0] * (1 - ratio));
 	let z = $derived(row - dir[1] * (1 - ratio));
 
 	$effect(() => {
-		ratio = moving ? 0 : 1;
+		if (moving) {
+			count = 0;
+		}
 	}); //evaluates whenever moving changes; activates only when the object is moving
 
 	const getcolor = (tp: number) => {
