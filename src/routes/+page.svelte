@@ -25,8 +25,6 @@
 		obj.set_at(box.position, box.id);
 	}
 
-	let action_id = 0;
-
 	function handleKeyDown(event: KeyboardEvent) {
 		if (player.moving) {
 			return;
