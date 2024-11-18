@@ -6,32 +6,20 @@
   import { Canvas, T} from "@threlte/core";
   import Floor from "../components/Floor.svelte";
   import Object from "../components/Object.svelte";
+  import map from "../map.json";
 
   let lastFrameTime = 0;
   let frame = 0;
+  
+  let land = new Map2D(map.land);
 
-  let land = new Map2D([
-    [1, 0, 0, 0],
-    [0, 0, 0, 5],
-    [0, 0, 0, 0],
-    [0, 0, 0, 0],
-    [0, 0, 1, 0],
-    [1, 0, 0, 0],
-  ]);
+  function create2DArray(rows : number, cols : number, fillValue : number) {
+    return Array.from({ length: rows }, () => Array(cols).fill(fillValue));
+  }
 
-  let obj = new Map2D([
-    [-1, -1, -1, -1],
-    [-1, -1, -1, -1],
-    [-1, -1, -1, -1],
-    [-1, -1, -1, -1],
-    [-1, -1, -1, -1],
-    [-1, -1, -1, -1],
-  ]);
-  let player = new Box([0, 3], 0);
-  new Box([1, 3], 1);
-  new Box([3, 2], 1);
-  new Box([1, 1], 2);
-  new Box([1, 4], 2);
+  let obj = new Map2D(create2DArray(land.height, land.width, -1));
+  let player = new Box(map.player as vector, 0);
+  map.boxes.forEach(([pos, type]) => new Box(pos as vector, type as number));
   for (const boxId in boxes) {
     const box = boxes[boxId];
     obj.set_at(box.position, box.id);
@@ -201,22 +189,25 @@
   $inspect(obj.info);
 
   const indices : number[][] = [];
-  for (let row = 0; row < 6; row++) {
-    for (let col = 0; col < 4; col++) {
+  for (let row = 0; row < land.height; row++) {
+    for (let col = 0; col < land.width; col++) {
       indices.push([row, col]); // Add the (row, column) pair to the array
     }
   }
+
+  const hw = (land.width-1) / 2;
+  const hh = (land.height-1) / 2;
 </script>
 
 <Canvas>
 	<T.PerspectiveCamera
     makeDefault
-    position={[(land.width-1) / 2, 10, land.height+3]}
+    position={[hw, 10, land.height]}
     oncreate={(ref) => {
-      ref.lookAt((land.width-1) / 2, 0, (land.height-1)/2);
+      ref.lookAt(hw, 0, hh);
     }}
   />
-  <T.DirectionalLight position={[0, 40, 20]} castShadow/>
+  <T.DirectionalLight position={[hw, 40, hh]} castShadow/>
   {#each land.info as row, rowIndex}
 	  {#each row as land_type, colIndex}
 		<Floor row={rowIndex} col={colIndex} type={land_type}/>
