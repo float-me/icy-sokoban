@@ -2,22 +2,27 @@
 	import { T, useTask } from "@threlte/core";
 	let { row, col, type, dir, moving } = $props();
 
+	const maxCount = 10;
+
 	let count = $state(0);
 	useTask((delta) => {
-		if (count < 10) {
+		if (count < maxCount) {
 			count += 1;
 		}
 	});
 
-	const slow_start = (p:number) => p*p*(2-p);
-	let ratio = $derived(moving === 1? count / 10 : slow_start(count/10));
+	const slow_start = (p: number) => p * p * (2 - p);
+	let ratio = $derived(
+		moving === 2 ? count / maxCount : slow_start(count / maxCount)
+	);
 
 	let x = $derived(col - dir[0] * (1 - ratio));
 	let z = $derived(row - dir[1] * (1 - ratio));
 
 	$effect(() => {
-		if (moving) {
-			count = 0;
+		count = (row + col) * 0;
+		if (moving === 0) {
+			count = maxCount;
 		}
 	}); //evaluates whenever moving changes; activates only when the object is moving
 
@@ -35,7 +40,6 @@
 	};
 
 	let color = $derived(getcolor(type));
-
 </script>
 
 {#if type === 0}

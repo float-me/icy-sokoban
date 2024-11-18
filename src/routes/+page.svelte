@@ -65,11 +65,13 @@
 	function add_move(box: Box, direction: vector, push: boolean = false) {
 		let after = add_vector(box.position, direction);
 		if (!is_valid(after)) {
+			box.moving = 0;
 			return false;
 		}
 		const boxId = obj.get_at(after);
 		if (boxId !== -1) {
 			if (!box.pushable || !push) {
+				box.moving = 0;
 				return false;
 			}
 			const afterBox = boxes[boxId];
@@ -78,6 +80,7 @@
 				rewrite(box, after, direction);
 				return true;
 			}
+			box.moving = 0;
 			return false;
 		}
 		rewrite(box, after, direction);
@@ -118,7 +121,7 @@
 		const boxId = obj.get_at(action.position);
 		const box = boxes[boxId];
 		box.position = action.position;
-		box.moving = 0;
+
 		switch (land.get_at(action.position)) {
 			case 2:
 				add_move(box, action.direction);
@@ -139,6 +142,8 @@
 				if (box.objType === 2) {
 					// Icy Box
 					add_move(box, action.direction);
+				} else {
+					box.moving = 0;
 				}
 				break;
 		}
