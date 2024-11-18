@@ -30,6 +30,7 @@ export class Box {
   position: vector = $state([0, 0])
   direction: vector = $state([0, 0])
   moving: number = $state(0)
+  count: number = $state(0)
   pushable: boolean
   objType: number
   constructor (position: vector, objType: number) {

@@ -93,6 +93,7 @@
 		} else {
 			box.moving = 1;
 		}
+		box.count = 0;
 		obj.set_at(after, box.id);
 		obj.set_at(box.position, -1);
 		box.position = after;
@@ -172,13 +173,7 @@
 		{/each}
 	{/each}
 	{#each boxes as box}
-		<Object
-			row={box.position[1]}
-			col={box.position[0]}
-			type={box.objType}
-			dir={box.direction}
-			moving={box.moving}
-		/>
+		<Object {box} />
 	{/each}
 </Canvas>
 

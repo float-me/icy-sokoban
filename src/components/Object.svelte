@@ -1,30 +1,25 @@
 <script lang="ts">
+	import type { Box } from "$lib/map2d.svelte";
 	import { T, useTask } from "@threlte/core";
-	let { row, col, type, dir, moving } = $props();
+	let { box }: { box: Box } = $props();
 
 	const maxCount = 10;
 
-	let count = $state(0);
 	useTask((delta) => {
-		if (count < maxCount) {
-			count += 1;
+		if (box.count < maxCount) {
+			box.count += 1;
 		}
 	});
 
 	const slow_start = (p: number) => p * p * (2 - p);
 	let ratio = $derived(
-		moving === 2 ? count / maxCount : slow_start(count / maxCount)
+		box.moving === 2
+			? box.count / maxCount
+			: slow_start(box.count / maxCount)
 	);
 
-	let x = $derived(col - dir[0] * (1 - ratio));
-	let z = $derived(row - dir[1] * (1 - ratio));
-
-	$effect(() => {
-		count = (row + col) * 0;
-		if (moving === 0) {
-			count = maxCount;
-		}
-	}); //evaluates whenever moving changes; activates only when the object is moving
+	let x = $derived(box.position[0] - box.direction[0] * (1 - ratio));
+	let z = $derived(box.position[1] - box.direction[1] * (1 - ratio));
 
 	const getcolor = (tp: number) => {
 		switch (tp) {
@@ -39,10 +34,10 @@
 		}
 	};
 
-	let color = $derived(getcolor(type));
+	let color = $derived(getcolor(box.objType));
 </script>
 
-{#if type === 0}
+{#if box.objType === 0}
 	<T.Mesh position={[x, 0.9, z]} castShadow>
 		<T.SphereGeometry args={[0.4, 32, 16]} />
 		<T.MeshStandardMaterial color="rgb(0,0,0)" roughness={0.5} />
