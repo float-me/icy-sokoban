@@ -3,9 +3,9 @@
 	let { row, col, type, dir, moving } = $props();
 
 	let count = $state(0);
-	let ratio = $derived(count / 100);
+	let ratio = $derived(count / 10);
 	useTask((delta) => {
-		if (count < 100) {
+		if (count < 10) {
 			count += 1;
 		}
 	});

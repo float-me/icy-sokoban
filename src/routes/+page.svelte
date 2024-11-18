@@ -90,7 +90,7 @@
 		obj.set_at(box.position, -1);
 		box.position = after;
 		box.direction = direction;
-		actionQueue.push(new Action(frame + 100, after, direction));
+		actionQueue.push(new Action(frame + 10, after, direction));
 	}
 
 	function gameLoop(time: number) {
@@ -144,17 +144,19 @@
 	if (typeof window !== "undefined") {
 		requestAnimationFrame(gameLoop);
 	}
+  const hw = (land.width-1) / 2;
+  const hh = (land.height-1) / 2;
 </script>
 
 <Canvas>
 	<T.PerspectiveCamera
-		makeDefault
-		position={[(land.width - 1) / 2, 10, land.height + 3]}
-		oncreate={(ref) => {
-			ref.lookAt((land.width - 1) / 2, 0, (land.height - 1) / 2);
-		}}
-	/>
-	<T.DirectionalLight position={[0, 40, 20]} castShadow />
+    makeDefault
+    position={[hw, 10, land.height]}
+    oncreate={(ref) => {
+      ref.lookAt(hw, 0, hh);
+    }}
+  />
+  <T.DirectionalLight position={[hw, 40, hh]} castShadow/>
 	{#each land.info as row, rowIndex}
 		{#each row as land_type, colIndex}
 			<Floor row={rowIndex} col={colIndex} type={land_type} />
