@@ -100,7 +100,7 @@
 		obj.set_at(box.position, -1);
 		box.position = after;
 		box.direction = direction;
-		actionQueue.push(new Action(frame + 10, after, direction));
+		actionQueue.push(new Action(frame + 100, after, direction));
 	}
 
 	function gameLoop(time: number) {

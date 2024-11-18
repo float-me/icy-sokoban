@@ -23,8 +23,7 @@ export class Map2D {
 }
 
 let boxId = 0
-const v: Array<Box> = []
-export const boxes = $state(v)
+export const boxes = $state([] as Array<Box>)
 
 export class Box {
   id: number
