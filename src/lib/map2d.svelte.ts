@@ -29,7 +29,7 @@ export class Box {
   id: number
   position: vector = $state([0, 0])
   direction: vector = $state([0, 0])
-  moving: boolean = $state(false)
+  moving: number = $state(0)
   pushable: boolean
   objType: number
   constructor (position: vector, objType: number) {
@@ -43,7 +43,7 @@ export class Box {
     } else {
       this.pushable = false
     }
-    this.moving = false
+    this.moving = 0
     boxes.push(this)
   }
 }

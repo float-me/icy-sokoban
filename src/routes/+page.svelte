@@ -2,30 +2,30 @@
 	import { add_vector, Box, boxes, Map2D } from "$lib/map2d.svelte";
 	import type { vector } from "$lib/map2d.svelte";
 
-  import { Canvas, T} from "@threlte/core";
-  import Floor from "../components/Floor.svelte";
-  import Object from "../components/Object.svelte";
-  import map from "../map.json";
+	import { Canvas, T } from "@threlte/core";
+	import Floor from "../components/Floor.svelte";
+	import Object from "../components/Object.svelte";
+	import map from "../map.json";
 	import { Action, actionQueue } from "$lib/action";
 
-  let lastFrameTime = 0;
-  let frame = 0;
-  
-  let land = new Map2D(map.land);
+	let lastFrameTime = 0;
+	let frame = 0;
 
-  function create2DArray(rows : number, cols : number, fillValue : number) {
-    return Array.from({ length: rows }, () => Array(cols).fill(fillValue));
-  }
+	let land = new Map2D(map.land);
 
-  let obj = new Map2D(create2DArray(land.height, land.width, -1));
-  let player = new Box(map.player as vector, 0);
-  map.boxes.forEach(([pos, type]) => new Box(pos as vector, type as number));
-  for (const boxId in boxes) {
-    const box = boxes[boxId];
-    obj.set_at(box.position, box.id);
-  }
+	function create2DArray(rows: number, cols: number, fillValue: number) {
+		return Array.from({ length: rows }, () => Array(cols).fill(fillValue));
+	}
 
-  let action_id = 0;
+	let obj = new Map2D(create2DArray(land.height, land.width, -1));
+	let player = new Box(map.player as vector, 0);
+	map.boxes.forEach(([pos, type]) => new Box(pos as vector, type as number));
+	for (const boxId in boxes) {
+		const box = boxes[boxId];
+		obj.set_at(box.position, box.id);
+	}
+
+	let action_id = 0;
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (player.moving) {
@@ -85,7 +85,11 @@
 	}
 
 	function rewrite(box: Box, after: vector, direction: vector) {
-		box.moving = true;
+		if (box.moving) {
+			box.moving = 2;
+		} else {
+			box.moving = 1;
+		}
 		obj.set_at(after, box.id);
 		obj.set_at(box.position, -1);
 		box.position = after;
@@ -114,7 +118,7 @@
 		const boxId = obj.get_at(action.position);
 		const box = boxes[boxId];
 		box.position = action.position;
-		box.moving = false;
+		box.moving = 0;
 		switch (land.get_at(action.position)) {
 			case 2:
 				add_move(box, action.direction);
@@ -144,19 +148,19 @@
 	if (typeof window !== "undefined") {
 		requestAnimationFrame(gameLoop);
 	}
-  const hw = (land.width-1) / 2;
-  const hh = (land.height-1) / 2;
+	const hw = (land.width - 1) / 2;
+	const hh = (land.height - 1) / 2;
 </script>
 
 <Canvas>
 	<T.PerspectiveCamera
-    makeDefault
-    position={[hw, 10, land.height]}
-    oncreate={(ref) => {
-      ref.lookAt(hw, 0, hh);
-    }}
-  />
-  <T.DirectionalLight position={[hw, 40, hh]} castShadow/>
+		makeDefault
+		position={[hw, 10, land.height]}
+		oncreate={(ref) => {
+			ref.lookAt(hw, 0, hh);
+		}}
+	/>
+	<T.DirectionalLight position={[hw, 40, hh]} castShadow />
 	{#each land.info as row, rowIndex}
 		{#each row as land_type, colIndex}
 			<Floor row={rowIndex} col={colIndex} type={land_type} />
