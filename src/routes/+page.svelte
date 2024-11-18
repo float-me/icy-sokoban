@@ -2,40 +2,30 @@
 	import { add_vector, Box, boxes, Map2D } from "$lib/map2d.svelte";
 	import type { vector } from "$lib/map2d.svelte";
 
-	import { Canvas, T } from "@threlte/core";
-	import Floor from "../components/Floor.svelte";
-	import Object from "../components/Object.svelte";
+  import { Canvas, T} from "@threlte/core";
+  import Floor from "../components/Floor.svelte";
+  import Object from "../components/Object.svelte";
+  import map from "../map.json";
 	import { Action, actionQueue } from "$lib/action";
 
-	let lastFrameTime = 0;
-	let frame = 0;
+  let lastFrameTime = 0;
+  let frame = 0;
+  
+  let land = new Map2D(map.land);
 
-	let land = new Map2D([
-		[1, 0, 0, 0],
-		[0, 0, 0, 5],
-		[0, 0, 0, 0],
-		[0, 0, 0, 0],
-		[0, 0, 1, 0],
-		[1, 0, 0, 0],
-	]);
+  function create2DArray(rows : number, cols : number, fillValue : number) {
+    return Array.from({ length: rows }, () => Array(cols).fill(fillValue));
+  }
 
-	let obj = new Map2D([
-		[-1, -1, -1, -1],
-		[-1, -1, -1, -1],
-		[-1, -1, -1, -1],
-		[-1, -1, -1, -1],
-		[-1, -1, -1, -1],
-		[-1, -1, -1, -1],
-	]);
-	let player = new Box([0, 3], 0);
-	new Box([1, 3], 1);
-	new Box([3, 2], 1);
-	new Box([1, 1], 2);
-	new Box([1, 4], 2);
-	for (const boxId in boxes) {
-		const box = boxes[boxId];
-		obj.set_at(box.position, box.id);
-	}
+  let obj = new Map2D(create2DArray(land.height, land.width, -1));
+  let player = new Box(map.player as vector, 0);
+  map.boxes.forEach(([pos, type]) => new Box(pos as vector, type as number));
+  for (const boxId in boxes) {
+    const box = boxes[boxId];
+    obj.set_at(box.position, box.id);
+  }
+
+  let action_id = 0;
 
 	function handleKeyDown(event: KeyboardEvent) {
 		if (player.moving) {
