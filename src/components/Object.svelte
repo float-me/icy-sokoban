@@ -1,9 +1,16 @@
 <script lang="ts">
 	import { add_vector, type Box, type vector } from "$lib/map2d.svelte";
+  	import { useGltf } from '@threlte/extras';
 	import { T, useTask } from "@threlte/core";
 	let { box }: { box: Box } = $props();
 	import { Anim, AnimGroup } from "$lib/animation";
 	import {vertexShader, fragmentShader} from "../materials/shinyshader";
+
+	let gltf = $state(undefined );
+	$effect(async ()=>{
+		if(gltf === undefined)
+			gltf = await useGltf('/models/box.glb');
+	});
 
 	let animGroup = new AnimGroup();
 
@@ -62,9 +69,8 @@
 				return "hotpink";
 		}
 	};
-
+	
 	let color = $derived(getcolor(box.objType));
-	let time :number= 0;
 </script>
 
 {#if box.objType === 0}
@@ -85,9 +91,13 @@
 		uniforms.time.value = {shinePos}
 		/>
 	</T.Mesh>
-{:else}
-	<T.Mesh position={[x, 0.9, z]} castShadow>
-		<T.BoxGeometry args={[0.8, 0.8, 0.8]} />
+{:else if gltf !== undefined}
+	<T.Mesh position={[x, 0.9, z]} castShadow
+	geometry={gltf.nodes['Cube'].geometry}
+	scale={[0.4, 0.4, 0.4]}
+	rotation={[-Math.PI / 2, 0, 0]}>
+		<!-- <T.BoxGeometry args={[0.8, 0.8, 0.8]} /> -->
 		<T.MeshStandardMaterial {color} />
 	</T.Mesh>
 {/if}
+
