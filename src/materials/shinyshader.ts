@@ -12,14 +12,18 @@ const fragmentShader :string = `
           uniform vec3 color;
           varying vec3 vPosition;
 
-          float cosineSquared(float x) {
+          /*float cosineSquared(float x) {
               return (1.0 - x * x) * (1.0 - x * x);
+          }*/
+
+          float cauchy(float x, float a) {
+            return a/(x*x+a);
           }
 
           void main() {
             float stripPosition = time;
-            float intensity = cosineSquared(clamp(1.5 * abs(vPosition.x + vPosition.z - stripPosition) + 0.5*abs(vPosition.y - 0.4), 0.0, 1.0));
-  
+            //float intensity = cosineSquared(clamp(1.5 * abs(vPosition.x + vPosition.z - stripPosition) + 0.5*abs(vPosition.y - 0.4), 0.0, 1.0));
+            float intensity = cauchy(abs(vPosition.x + vPosition.z - stripPosition) + 0.4*abs(vPosition.y - 0.4), 0.2);
             vec3 highlight = vec3(0.8) * intensity; // White strip
             gl_FragColor = vec4(color + highlight, 1.0);
           }
