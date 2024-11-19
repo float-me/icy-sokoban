@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Box } from "$lib/map2d.svelte";
+	import { add_vector, type Box, type vector } from "$lib/map2d.svelte";
 	import { T, useTask } from "@threlte/core";
 	let { box }: { box: Box } = $props();
 	import { Anim, AnimGroup } from "$lib/animation";
@@ -7,12 +7,16 @@
 	let animGroup = new AnimGroup();
 
 	let moveRatio = $state(1);
+
+	let failMoveDisp = $state([0,0]);
+
 	// x, z only updates when moveRatio changes; Therefore, they do not change when the position of the box changed but the animation didn't start.
-	let x = $derived(box.position[0] - box.direction[0] * (1 - moveRatio));
-	let z = $derived(box.position[1] - box.direction[1] * (1 - moveRatio));
+	let x = $derived(box.position[0] - box.direction[0] * (1 - moveRatio) + failMoveDisp[0]);
+	let z = $derived(box.position[1] - box.direction[1] * (1 - moveRatio) + failMoveDisp[1]);
 
 	useTask((delta) => {
 		animGroup.update();
+		failMoveDisp = [0,0];
 		for (const anim of animGroup.anims) {
 			switch (anim.name) {
 				case "slow-start":
@@ -22,6 +26,10 @@
 				case "normal-start":
 					moveRatio = anim.ratio;
 					break;
+				case "fail-move":
+					const length = anim.ratio * anim.ratio * (1-anim.ratio) * 0.4;
+					failMoveDisp = [anim.data[0] * length, anim.data[1]*length]
+					break;
 				default:
 					break;
 			}
@@ -30,6 +38,10 @@
 
 	export function add_anim(name: string, data: any) {
 		animGroup.add_anim(new Anim(name, data));
+	}
+
+	export function get_anim() {
+		return animGroup;
 	}
 
 	const getcolor = (tp: number) => {

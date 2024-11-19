@@ -1,8 +1,9 @@
 import { PriorityDeque } from 'priority-deque'
 
-let animTime = new Map<string, number>([
+const animTime = new Map<string, number>([
   ['slow-start', 10],
-  ['normal-start', 10]
+  ['normal-start', 10],
+  ['fail-move', 10]
 ])
 
 export function get_anim_time (name: string) {
@@ -50,12 +51,16 @@ export class AnimGroup {
   add_anim (anim: Anim) {
     this.anims.push(anim)
   }
+  contains (animname : string) {
+    return (this.anims.find((e: Anim)=>e.name === animname) !== undefined)
+  }
+
   update () {
     this.anims.forEach(anim => {
       anim.count -= 1
     })
     while (true) {
-      let first = this.anims.findMin()
+      const first = this.anims.findMin()
       if (first) {
         if (first.count >= 0) {
           break

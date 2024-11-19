@@ -30,21 +30,34 @@
 		if (player.moving) {
 			return;
 		}
+		let dir :vector = [0,0];
+		let success = true;
+		
 		switch (event.key) {
 			case "ArrowUp":
-				add_move(player, [0, -1], true);
+				dir = [0, -1];
+				success = add_move(player, dir, true);
 				break;
 			case "ArrowDown":
-				add_move(player, [0, 1], true);
+				dir = [0, 1];
+				success = add_move(player, dir, true);
 				break;
 			case "ArrowLeft":
-				add_move(player, [-1, 0], true);
+				dir = [-1, 0];
+				success = add_move(player, dir, true);
 				break;
 			case "ArrowRight":
-				add_move(player, [1, 0], true);
+				dir = [1, 0];
+				success = add_move(player, dir, true);
 				break;
 			default:
 				break;
+		}
+
+		//failed to move. add short animation.
+		if(!success){
+			if(!player.node.get_anim().contains('fail-move'))
+				player.node.add_anim('fail-move', dir);
 		}
 	}
 
