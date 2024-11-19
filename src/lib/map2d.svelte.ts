@@ -27,10 +27,10 @@ export const boxes = $state([] as Array<Box>)
 
 export class Box {
   id: number
-  position: vector = $state([0, 0])
-  direction: vector = $state([0, 0])
-  moving: number = $state(0)
-  count: number = $state(0)
+  position: vector
+  direction: vector
+  moving: boolean
+  node: any
   pushable: boolean
   objType: number
   constructor (position: vector, objType: number) {
@@ -44,7 +44,7 @@ export class Box {
     } else {
       this.pushable = false
     }
-    this.moving = 0
+    this.moving = false
     boxes.push(this)
   }
 }

@@ -7,6 +7,7 @@
 	import Object from "../components/Object.svelte";
 	import map from "../map.json";
 	import { Action, actionQueue } from "$lib/action";
+	import { get_anim_time } from "$lib/animation";
 
 	let lastFrameTime = 0;
 	let frame = 0;
@@ -63,13 +64,13 @@
 	function add_move(box: Box, direction: vector, push: boolean = false) {
 		let after = add_vector(box.position, direction);
 		if (!is_valid(after)) {
-			box.moving = 0;
+			box.moving = false;
 			return false;
 		}
 		const boxId = obj.get_at(after);
 		if (boxId !== -1) {
 			if (!box.pushable || !push) {
-				box.moving = 0;
+				box.moving = false;
 				return false;
 			}
 			const afterBox = boxes[boxId];
@@ -78,7 +79,7 @@
 				rewrite(box, after, direction);
 				return true;
 			}
-			box.moving = 0;
+			box.moving = false;
 			return false;
 		}
 		rewrite(box, after, direction);
@@ -86,17 +87,19 @@
 	}
 
 	function rewrite(box: Box, after: vector, direction: vector) {
-		if (box.moving) {
-			box.moving = 2;
-		} else {
-			box.moving = 1;
+		let anim_name = "normal-start";
+		if (!box.moving) {
+			anim_name = "slow-start";
 		}
-		box.count = 0;
+		box.moving = true;
 		obj.set_at(after, box.id);
 		obj.set_at(box.position, -1);
 		box.position = after;
 		box.direction = direction;
-		actionQueue.push(new Action(frame + 10, after, direction));
+
+		const anim_time = get_anim_time(anim_name);
+		actionQueue.push(new Action(frame + anim_time, after, direction));
+		box.node.add_anim(anim_name, undefined);
 	}
 
 	function gameLoop(time: number) {
@@ -142,7 +145,7 @@
 					// Icy Box
 					add_move(box, action.direction);
 				} else {
-					box.moving = 0;
+					box.moving = false;
 				}
 				break;
 		}
@@ -171,7 +174,7 @@
 		{/each}
 	{/each}
 	{#each boxes as box}
-		<Object {box} />
+		<Object {box} bind:this={box.node} />
 	{/each}
 </Canvas>
 

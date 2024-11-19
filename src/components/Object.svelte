@@ -2,24 +2,35 @@
 	import type { Box } from "$lib/map2d.svelte";
 	import { T, useTask } from "@threlte/core";
 	let { box }: { box: Box } = $props();
+	import { Anim, AnimGroup } from "$lib/animation";
 
-	const maxCount = 10;
+	let animGroup = new AnimGroup();
+
+	let moveRatio = $state(1);
+	// x, z only updates when moveRatio changes; Therefore, they do not change when the position of the box changed but the animation didn't start.
+	let x = $derived(box.position[0] - box.direction[0] * (1 - moveRatio));
+	let z = $derived(box.position[1] - box.direction[1] * (1 - moveRatio));
 
 	useTask((delta) => {
-		if (box.count < maxCount) {
-			box.count += 1;
+		animGroup.update();
+		for (const anim of animGroup.anims) {
+			switch (anim.name) {
+				case "slow-start":
+					const slow_start = (p: number) => p * p * (2 - p);
+					moveRatio = slow_start(anim.ratio);
+					break;
+				case "normal-start":
+					moveRatio = anim.ratio;
+					break;
+				default:
+					break;
+			}
 		}
 	});
 
-	const slow_start = (p: number) => p * p * (2 - p);
-	let ratio = $derived(
-		box.moving === 2
-			? box.count / maxCount
-			: slow_start(box.count / maxCount)
-	);
-
-	let x = $derived(box.position[0] - box.direction[0] * (1 - ratio));
-	let z = $derived(box.position[1] - box.direction[1] * (1 - ratio));
+	export function add_anim(name: string, data: any) {
+		animGroup.add_anim(new Anim(name, data));
+	}
 
 	const getcolor = (tp: number) => {
 		switch (tp) {
