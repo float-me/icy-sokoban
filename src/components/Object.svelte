@@ -27,7 +27,7 @@
 					moveRatio = anim.ratio;
 					break;
 				case "fail-move":
-					const length = anim.ratio * anim.ratio * (1-anim.ratio) * 0.4;
+					const length = anim.ratio * anim.ratio * (1-anim.ratio) * 0.8;
 					failMoveDisp = [anim.data[0] * length, anim.data[1]*length]
 					break;
 				default:
