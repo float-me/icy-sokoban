@@ -98,6 +98,10 @@
 				return false;
 			}
 			const afterBox = boxes[boxId];
+			if (afterBox.moving) {
+				box.moving = false;
+				return false;
+			}
 			let box_move = add_move(afterBox, direction);
 			if (box_move) {
 				rewrite(box, after, direction);
