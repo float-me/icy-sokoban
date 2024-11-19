@@ -8,6 +8,7 @@
 	import map from "../map.json";
 	import { Action, actionQueue } from "$lib/action";
 	import { get_anim_time } from "$lib/animation";
+	import Button from "../components/Button.svelte";
 
 	let lastFrameTime = 0;
 	let frame = 0;
@@ -30,9 +31,9 @@
 		if (player.moving) {
 			return;
 		}
-		let dir :vector = [0,0];
+		let dir: vector = [0, 0];
 		let success = true;
-		
+
 		switch (event.key) {
 			case "ArrowUp":
 				dir = [0, -1];
@@ -51,17 +52,23 @@
 				success = add_move(player, dir, true);
 				break;
 			case " ":
-				console.log("dd")
-				boxes.filter(box =>box.objType === 2 && !box.node.get_anim().contains("shine")).forEach(box => box.node.add_anim("shine", undefined));
+				console.log("dd");
+				boxes
+					.filter(
+						(box) =>
+							box.objType === 2 &&
+							!box.node.get_anim().contains("shine")
+					)
+					.forEach((box) => box.node.add_anim("shine", undefined));
 				break;
 			default:
 				break;
 		}
 
 		//failed to move. add short animation.
-		if(!success){
-			if(!player.node.get_anim().contains('fail-move'))
-				player.node.add_anim('fail-move', dir);
+		if (!success) {
+			if (!player.node.get_anim().contains("fail-move"))
+				player.node.add_anim("fail-move", dir);
 		}
 	}
 
@@ -189,6 +196,9 @@
 		{#each row as land_type, colIndex}
 			<Floor row={rowIndex} col={colIndex} type={land_type} />
 		{/each}
+	{/each}
+	{#each map.button as vector[] as pos}
+		<Button {pos} />
 	{/each}
 	{#each boxes as box}
 		<Object {box} bind:this={box.node} />
