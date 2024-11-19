@@ -50,6 +50,10 @@
 				dir = [1, 0];
 				success = add_move(player, dir, true);
 				break;
+			case " ":
+				console.log("dd")
+				boxes.filter(box =>box.objType === 2 && !box.node.get_anim().contains("shine")).forEach(box => box.node.add_anim("shine", undefined));
+				break;
 			default:
 				break;
 		}

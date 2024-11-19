@@ -3,10 +3,13 @@
 	import { T, useTask } from "@threlte/core";
 	let { box }: { box: Box } = $props();
 	import { Anim, AnimGroup } from "$lib/animation";
+	import {vertexShader, fragmentShader} from "../materials/shinyshader";
 
 	let animGroup = new AnimGroup();
 
 	let moveRatio = $state(1);
+
+	let shinePos = $state(-2);
 
 	let failMoveDisp = $state([0,0]);
 
@@ -29,6 +32,9 @@
 				case "fail-move":
 					const length = anim.ratio * anim.ratio * (1-anim.ratio) * 0.8;
 					failMoveDisp = [anim.data[0] * length, anim.data[1]*length]
+					break;
+				case "shine":
+					shinePos = anim.ratio * 4 - 2;
 					break;
 				default:
 					break;
@@ -58,12 +64,26 @@
 	};
 
 	let color = $derived(getcolor(box.objType));
+	let time :number= 0;
 </script>
 
 {#if box.objType === 0}
 	<T.Mesh position={[x, 0.9, z]} castShadow>
 		<T.SphereGeometry args={[0.4, 32, 16]} />
 		<T.MeshStandardMaterial color="rgb(0,0,0)" roughness={0.5} />
+	</T.Mesh>
+{:else if box.objType === 2}
+	<T.Mesh position={[x, 0.9, z]} castShadow>
+		<T.BoxGeometry args={[0.8, 0.8, 0.8]} />
+		<T.ShaderMaterial
+		vertexShader={vertexShader}
+		fragmentShader={fragmentShader}
+		uniforms={{
+			color: { value: [0.3,0.7,0.7] }, 
+			time: { value: -3 }
+		}}
+		uniforms.time.value = {shinePos}
+		/>
 	</T.Mesh>
 {:else}
 	<T.Mesh position={[x, 0.9, z]} castShadow>
