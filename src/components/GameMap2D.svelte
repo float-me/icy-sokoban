@@ -72,7 +72,11 @@ style:background-color={getboxcolor(box.objType)}
         aspect-ratio: 1/1;
         width: 80%;
         height: 80%;
-  justify-self: center;
-  align-self: center;
+        justify-self: center;
+        align-self: center;
+        border-width: 3px;
+        border-color: rgba(0, 0, 0, 0.4);
+        box-sizing: border-box;
+        border-radius: 3px;
     }
 </style>
