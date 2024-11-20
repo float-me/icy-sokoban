@@ -9,6 +9,7 @@
 	import { Action, actionQueue } from "$lib/action";
 	import { get_anim_time } from "$lib/animation";
 	import Button from "../components/Button.svelte";
+  import GameMap2D from "../components/GameMap2D.svelte";
 
 	let lastFrameTime = 0;
 	let frame = 0;
@@ -209,4 +210,9 @@
 	{/each}
 </Canvas>
 
+<GameMap2D land={land} --width="3%"/>
+
 <svelte:window onkeydown={handleKeyDown} />
+
+<style>
+</style>
