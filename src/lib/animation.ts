@@ -4,7 +4,7 @@ const animTime = new Map<string, number>([
   ['slow-start', 10],
   ['normal-start', 10],
   ['fail-move', 10],
-  ['shine', 10]
+  ['shine', 25]
 ])
 
 export function get_anim_time (name: string) {

@@ -16,6 +16,8 @@
 
 	let land = new Map2D(map.land);
 
+	const shineperiod = 250;
+
 	function create2DArray(rows: number, cols: number, fillValue: number) {
 		return Array.from({ length: rows }, () => Array(cols).fill(fillValue));
 	}
@@ -51,16 +53,6 @@
 			case "ArrowRight":
 				dir = [1, 0];
 				success = add_move(player, dir, true);
-				break;
-			case " ":
-				console.log("dd");
-				boxes
-					.filter(
-						(box) =>
-							box.objType === 2 &&
-							!box.node.get_anim().contains("shine")
-					)
-					.forEach((box) => box.node.add_anim("shine", undefined));
 				break;
 			default:
 				break;
@@ -146,6 +138,18 @@
 			lastFrameTime = time;
 		}
 		requestAnimationFrame(gameLoop);
+
+		if(frame%shineperiod === 0){
+			boxes
+				.filter(
+					(box) =>
+						box.objType === 2 &&
+						!box.node.get_anim().contains("shine")
+				)
+				.forEach((box) => box.node.add_anim("shine", undefined));
+
+		}
+			
 	}
 
 	function calc(action: Action) {
