@@ -34,7 +34,7 @@ export const boxes = $state([] as Array<Box>)
 
 export class Box {
   id: number
-  position: vector
+  position: vector = $state([0,0])
   direction: vector
   moving: boolean
   node: any

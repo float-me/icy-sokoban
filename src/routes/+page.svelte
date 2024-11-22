@@ -214,9 +214,7 @@
 	{/each}
 </Canvas>
 
-<GameMap2D land={land} --width="3%"/>
+<GameMap2D land={land} buttons={map.button as vector[]}/>
 
 <svelte:window onkeydown={handleKeyDown} />
 
-<style>
-</style>

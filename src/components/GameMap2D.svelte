@@ -1,6 +1,20 @@
 <script lang="ts">
-    import { Box, Map2D, boxes } from "$lib/map2d.svelte";
-    let {land}:{land? : Map2D}= $props()
+    import { Map2D, boxes, type vector } from "$lib/map2d.svelte";
+    import {check, x} from "../svgdata.json";
+    let {land, buttons}:{land : Map2D, buttons : vector[]}= $props()
+
+    function compvec(v1:vector, v2:vector) {
+        return v1[0]===v2[0] && v1[1]===v2[1]
+    }
+
+    //find buttons that are not on any land
+    let buttons_checked = $derived(
+        buttons.map((vec) => ({vec : vec, chk : boxes.findIndex((bx) => bx.objType !== 0 && compvec(bx.position, vec)) >= 0}))
+    )
+
+    const contains = (li: vector[], vec : vector) => {
+        return li.findIndex((v) => v[0]===vec[0]&&v[1]===vec[1]) >= 0
+    }
 
     const getlandcolor = (tp: number) => {
 		switch (tp) {
@@ -15,7 +29,7 @@
 	const getboxcolor = (tp: number) => {
 		switch (tp) {
 			case 0:
-				return "rgb(112, 219, 112)";
+				return "rgb(150, 150, 150)";
 			case 1:
 				return "#f5d184";
 			case 2:
@@ -24,12 +38,14 @@
 				return "hotpink";
 		}
 	};
+
+    const getsvgcolor = (chk:boolean) => chk?"#99ff66":"#ff0000";
 </script>
 
 <div
 style:display = "grid"
-style:grid-template-column = {`repeat(${land?.width}, 1fr)`}
-style:grid-template-row = {`repeat(${land?.height}, 1fr)`}
+style:grid-template-columns = {`repeat(${land?.width}, 1fr)`}
+style:grid-template-rows = {`repeat(${land?.height}, 1fr)`}
 class="maingrid"
 >
 {#if land !== undefined}
@@ -46,22 +62,35 @@ class="maingrid"
 {/if}
 {#each boxes as box}
 <div 
-class="box"
+class={`box ${box.objType === 0 ?"player":""}`}
 style:grid-column={`${box.position[0]+1}/${box.position[0]+2}`}
 style:grid-row={box.position[1]+1}
 style:background-color={getboxcolor(box.objType)}
-></div>
+>
+</div>
 {/each}
-
+{#each buttons_checked as {vec, chk}}
+<svg
+style:grid-column={`${vec[0]+1}/${vec[0]+2}`}
+style:grid-row={vec[1]+1}
+viewBox={chk ? check.viewBox : x.viewBox}
+class="button"
+fill={getsvgcolor(chk)}
+>
+<path d={chk ? check.path : x.path}
+stroke={getsvgcolor(chk)}
+stroke-width=8%/>
+</svg>
+{/each}
 </div>
 
 <style>
     .maingrid{
 		position:fixed;
-        width: var(--width, 10%);
-        height: var(--height, 30%);
-        left: var(--left, 0);
-        top: var(--top, 0);
+        width: 10%;
+        max-width: 10%;
+        left: 0;
+        top: 0;
     }
     .land {
         aspect-ratio: 1/1;
@@ -78,5 +107,15 @@ style:background-color={getboxcolor(box.objType)}
         border-color: rgba(0, 0, 0, 0.4);
         box-sizing: border-box;
         border-radius: 3px;
+    }
+    .player {
+        border-radius: 50%;
+    }
+    .button {
+        justify-self: center;
+        align-self: center;
+        object-fit: contain;
+        width: 70%;
+        height: 70%;
     }
 </style>

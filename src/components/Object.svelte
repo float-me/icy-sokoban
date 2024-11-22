@@ -15,12 +15,8 @@
 	let failMoveDisp = $state([0, 0]);
 
 	// x, z only updates when moveRatio changes; Therefore, they do not change when the position of the box changed but the animation didn't start.
-	let x = $derived(
-		box.position[0] - box.direction[0] * (1 - moveRatio) + failMoveDisp[0]
-	);
-	let z = $derived(
-		box.position[1] - box.direction[1] * (1 - moveRatio) + failMoveDisp[1]
-	);
+	let x = $state(0)
+	let z = $state(0)
 
 	useTask((delta) => {
 		animGroup.update();
@@ -49,6 +45,8 @@
 					break;
 			}
 		}
+		x = box.position[0] - box.direction[0] * (1 - moveRatio) + failMoveDisp[0]
+		z = box.position[1] - box.direction[1] * (1 - moveRatio) + failMoveDisp[1]
 	});
 
 	export function add_anim(name: string, data: any) {
