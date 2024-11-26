@@ -28,7 +28,7 @@
 	</T.Mesh>
 {/if}
 
-{#if type >= 3 && type <= 7}
+{#if type >= 3 && type <= 6}
 	<T.Mesh position={[col, 0.5, row]}>
 		<T.CylinderGeometry
 			args={[0.5, 0.5, 0.2, 3, 1, false, (3.142 * (type - 2)) / 2]}
